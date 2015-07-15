@@ -1,23 +1,19 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 #Load the activity.csv file data using read.csv()
 df <- read.csv("activity.csv")
 
 #Format date column to date format 
 df$date <- as.Date(df$date)
-
 ```
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 #Load required libraries 
 library(ggplot2)
 
@@ -33,17 +29,31 @@ histplot <- ggplot(total.steps.by.day,aes(x = steps)) +
             xlab("Steps (binwidth 2000)") +
             geom_histogram(binwidth = 2000)
 histplot
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 #Calculate Mean Total Number of Steps Taken per day
 mean(total.steps.by.day$steps , na.rm = TRUE)
+```
 
+```
+## [1] 9354.23
+```
+
+```r
 #Calculate Median Total Number of Steps Taken per day
 median(total.steps.by.day$steps , na.rm = TRUE)
+```
 
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 #Average steps by period 
 average.steps.by.interval  <- aggregate(x = df$steps , by = list(df$interval), FUN = mean ,na.rm=TRUE)
 
@@ -55,17 +65,31 @@ avg.step.line <- ggplot(average.steps.by.interval,aes(interval,steps)) +
                  ggtitle("Time Series Plot of Average Steps by Interval") +
                  geom_line()
 avg.step.line  
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 #The 5-min time interval contains the maximum number of steps?
 average.steps.by.interval[which.max(average.steps.by.interval$steps),c("interval")]
+```
 
+```
+## [1] 835
 ```
 
 ## Imputing missing values
-```{r}
+
+```r
 #Total Number of Missing Values in the dataset
 nrow(df[is.na(df$steps),])
+```
 
+```
+## [1] 2304
+```
+
+```r
 #Imputing Missing Step Values with Mean Step at Time Interval
 df.imputed <- merge(x = df, y = average.steps.by.interval, by = "interval", all.x = TRUE)
 df.imputed[is.na(df.imputed$steps.x),c("steps.x")] <- df.imputed[is.na(df.imputed$steps.x),c("steps.y")]
@@ -91,18 +115,31 @@ histplot <- ggplot(total.steps.by.day,aes(x = steps)) +
             xlab("Steps (binwidth 2000)") +
             geom_histogram(binwidth = 2000)
 histplot 
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
+```r
 #Mean Total Number of Steps Taken per Day
 mean(total.steps.by.day$steps , na.rm = TRUE)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 #Median Total Number of Steps Taken per Day
 median(total.steps.by.day$steps , na.rm = TRUE)
+```
 
+```
+## [1] 10766.19
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r, fig.width= 10}
+
+```r
 #Factor variable with Two levels indicating a Weekday or Weekend.
 df.imputed$weekday <- as.factor(ifelse(weekdays(df.imputed$date) %in% c("Saturday","Sunday"), "Weekend", "Weekday")) 
 
@@ -120,6 +157,6 @@ avg.step.line <- ggplot(average.steps.by.interval.and.weekday,aes(interval,steps
                  facet_grid(. ~ weekday) +
                  geom_line(size = 1)
 avg.step.line  
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
